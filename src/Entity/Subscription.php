@@ -5,28 +5,23 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use JsonSerializable;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Enity()
- */
+#[ORM\Entity()]
 class Subscription implements JsonSerializable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type='integer')
-     */
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
     protected int $id;
 
-    /**
-     * @ORM\Column(type='string', length=255)
-     */
+    #[ORM\Column()]
     protected string $name;
 
-    /**
-     * @ORM\Column(type='datetime')
-     */
-    protected \DateTime $startDate;
+    #[ORM\Column(name: 'start_date', type: Types::DATE_IMMUTABLE)]
+    protected \DateTimeImmutable $startDate;
 
     public function jsonSerialize(): mixed
     {
@@ -47,12 +42,12 @@ class Subscription implements JsonSerializable
         return $this;
     }
 
-    public function getStartDate() : \DateTime 
+    public function getStartDate() : \DateTimeImmutable 
     {
         return $this->startDate;    
     }
 
-    public function setStartDate(\DateTime $startDate) : self
+    public function setStartDate(\DateTimeImmutable $startDate) : self
     {
         $this->startDate = $startDate;
         return $this;
