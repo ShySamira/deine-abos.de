@@ -13,6 +13,6 @@ class HomeController
 
         $response->setContent("<p>HalloWelt</p>");
 
-        return new Response();
+        return $response;
     }
 }

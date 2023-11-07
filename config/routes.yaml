@@ -7,3 +7,7 @@ controllers:
 index:
     path: /
     controller: App\Controller\HomeController::index
+
+list:
+    path: /subscriptions
+    controller: App\Controller\SubscriptionsController::list
