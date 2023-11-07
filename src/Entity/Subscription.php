@@ -2,13 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Entity;
 
 use JsonSerializable;
 
+/**
+ * @ORM\Enity()
+ */
 class Subscription implements JsonSerializable
 {
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type='integer')
+     */
+    protected int $id;
+
+    /**
+     * @ORM\Column(type='string', length=255)
+     */
     protected string $name;
+
+    /**
+     * @ORM\Column(type='datetime')
+     */
     protected \DateTime $startDate;
 
     public function jsonSerialize(): mixed
