@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\SubscriptionRepository;
 use JsonSerializable;
+use App\Repository\SubscriptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 class Subscription implements JsonSerializable
@@ -15,10 +16,11 @@ class Subscription implements JsonSerializable
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER)]
     protected int $id;
 
-    #[ORM\Column()]
+    #[ORM\Column(type: Types::STRING)]
+    #[Assert\NotBlank]
     protected string $name;
 
     #[ORM\Column(name: 'start_date', type: Types::DATE_IMMUTABLE)]
