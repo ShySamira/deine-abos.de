@@ -5,53 +5,54 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Subscription;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
 
 class SubscriptionsController extends AbstractController
 {
     
-public function __construct(private ManagerRegistry $doctrine) {}
+public function __construct(private ManagerRegistry $doctrine)
+{
+
+}
 
  public function list():Response
  {
+
+    $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
+
+    if(!$subscriptions){
+        return $this->json(['success' => false], 404);
+    }
     $dataArray = [
         'success' => true,
-        'subscriptions' => $this->generateSubscriptions(),
+        'subscriptions' => $subscriptions,
     ];
 
     return $this->json($dataArray);
  }
 
- protected function generateSubscriptions() : array
+ public function add(Request $request):Response
  {
-    $returnArray = [];
+    $subscriptionName = $request->request->get('name');
 
-    $entityManager = $this->doctrine->getManager();
-    $subscription1 = (new Subscription)
-        ->setName('Crunchyroll')
-        ->setStartDate(new \DateTimeImmutable());
+    if(is_string($subscriptionName))
+    {
+        $subscription = (new Subscription())->setName($subscriptionName)->setStartDate(new \DateTimeImmutable());
 
-    $entityManager->persist($subscription1);
+        $em = $this->doctrine->getManager();
+        $em->persist($subscription);
+        $em->flush();
+    
+        if($subscription->getId())
+        {
+            return $this->json(['success' => true, 'subscription' => $subscription], 201);
+        }
+    }
 
-
-    $subscription2 = (new Subscription)
-        ->setName('AnimeOnDemand')
-        ->setStartDate(new \DateTimeImmutable());
-
-    $entityManager->persist($subscription2);
-
-    $subscription3 = (new Subscription)
-        ->setName('Netflix')
-        ->setStartDate(new \DateTimeImmutable());
-
-    $entityManager->persist($subscription3);
-
-    $entityManager->flush();
-
-    return $returnArray;
+    return $this->json(['success' => false], 400);
  }
-
-
 }

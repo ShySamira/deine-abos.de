@@ -8,6 +8,12 @@ index:
     path: /
     controller: App\Controller\HomeController::index
 
-list:
+listSubscriptions:
     path: /subscriptions
+    methods: GET
     controller: App\Controller\SubscriptionsController::list
+
+addSubscriptions:
+    path: /subscription
+    methods: POST
+    controller: App\Controller\SubscriptionsController::add
