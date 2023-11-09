@@ -26,6 +26,9 @@ class Subscription implements JsonSerializable
     #[ORM\Column(name: 'start_date', type: Types::DATE_IMMUTABLE)]
     protected \DateTimeImmutable $startDate;
 
+    #[ORM\ManyToOne(inversedBy: 'subscriptions')]
+    private ?paymentType $paymentType = null;
+
     public function jsonSerialize(): mixed
     {
         return [
@@ -56,6 +59,18 @@ class Subscription implements JsonSerializable
     public function setStartDate(\DateTimeImmutable $startDate) : self
     {
         $this->startDate = $startDate;
+        return $this;
+    }
+
+    public function getPaymentType(): ?paymentType
+    {
+        return $this->paymentType;
+    }
+
+    public function setPaymentType(?paymentType $paymentType): static
+    {
+        $this->paymentType = $paymentType;
+
         return $this;
     }
 

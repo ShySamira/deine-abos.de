@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\PaymentTypeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use JsonSerializable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,6 +26,14 @@ class PaymentType implements JsonSerializable
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     protected ?string $description;
+
+    #[ORM\OneToMany(mappedBy: 'paymentType', targetEntity: Subscription::class)]
+    private Collection $subscriptions;
+
+    public function __construct()
+    {
+        $this->subscriptions = new ArrayCollection();
+    }
 
     public function jsonSerialize()
     {
@@ -62,6 +72,36 @@ class PaymentType implements JsonSerializable
     public function setDescription($description) : self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subscription>
+     */
+    public function getSubscriptions(): Collection
+    {
+        return $this->subscriptions;
+    }
+
+    public function addSubscription(Subscription $subscription): static
+    {
+        if (!$this->subscriptions->contains($subscription)) {
+            $this->subscriptions->add($subscription);
+            $subscription->setPaymentType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscription(Subscription $subscription): static
+    {
+        if ($this->subscriptions->removeElement($subscription)) {
+            // set the owning side to null (unless already changed)
+            if ($subscription->getPaymentType() === $this) {
+                $subscription->setPaymentType(null);
+            }
+        }
 
         return $this;
     }
