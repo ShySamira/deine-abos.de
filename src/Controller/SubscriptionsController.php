@@ -14,48 +14,89 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class SubscriptionsController extends AbstractController
 {
     
-public function __construct(private ManagerRegistry $doctrine)
-{
+    public function __construct(private ManagerRegistry $doctrine)
+    {
 
-}
-
- public function list():Response
- {
-
-    $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
-
-    if(!$subscriptions){
-        return $this->json(['success' => false], 404);
     }
-    $dataArray = [
-        'success' => true,
-        'subscriptions' => $subscriptions,
-    ];
 
-    return $this->json($dataArray);
- }
+    public function list():Response
+    {
 
- public function add(Request $request, ValidatorInterface $validator):Response
- {
-    $subscriptionName = $request->request->get('name');
+        $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
 
-    $subscription = (new Subscription())->setName($subscriptionName)->setStartDate(new \DateTimeImmutable());
-    $error = $validator->validate($subscription);
+        if(!$subscriptions){
+            return $this->json(['success' => false], 404);
+        }
+        $dataArray = [
+            'success' => true,
+            'subscriptions' => $subscriptions,
+        ];
 
-    if(0 !== count($error)){
-        $errorMessages = [];
+        return $this->json($dataArray);
+    }
 
-        foreach($error as $violation){
-            $errorMessages[] = $violation->getPropertyPath() . ": " . $violation->getMessage();
+    public function add(Request $request, ValidatorInterface $validator):Response
+    {
+        $subscriptionName = $request->request->get('name');
+
+        $subscription = (new Subscription())->setName($subscriptionName)->setStartDate(new \DateTimeImmutable());
+        $error = $validator->validate($subscription);
+
+        if(0 !== count($error)){
+            $errorMessages = [];
+
+            foreach($error as $violation){
+                $errorMessages[] = $violation->getPropertyPath() . ": " . $violation->getMessage();
+            }
+
+            return $this->json(['success' => false, 'errors' => $errorMessages], 400);
         }
 
-        return $this->json(['success' => false, 'errors' => $errorMessages], 400);
+        $em = $this->doctrine->getManager();
+        $em->persist($subscription);
+        $em->flush();
+
+        return $this->json(['success' => true, 'subscriptions' => $subscription], 201);
     }
 
-    $em = $this->doctrine->getManager();
-    $em->persist($subscription);
-    $em->flush();
+    public function update(int $id, Request $request, ValidatorInterface $validator) : Response 
+    {
+        $subscription = $this->doctrine->getRepository(Subscription::class)->find($id);
 
-    return $this->json(['success' => true, 'subscriptions' => $subscription], 201);
- }
+        if(!$subscription){
+            return $this->json([], 400);
+        }
+
+        $requestData = $request->request->all();
+
+        $this->setDataToPaymentType($requestData, $subscription);
+
+        $error = $validator->validate($subscription);
+
+        if(0 !== count($error)){
+            $errorMessages = [];
+
+            foreach($error as $violation){
+                $errorMessages[] = $violation->getPropertyPath() . ": " . $violation->getMessage();
+            }
+
+            return $this->json(['success' => false, 'errors' => $errorMessages], 400);
+        }
+
+        $em = $this->doctrine->getManager();
+        $em->flush();
+
+        return $this->json(['success' => true, 'paymentType' => $subscription], 201);
+    }
+
+    protected function setDataToPaymentType(array $requestData, object $subscription){
+
+        foreach($requestData as $key => $value){
+            $methodName = 'set' . ucfirst($key);
+            if(!empty($requestData) && method_exists($subscription, $methodName)){
+                method_exists($subscription, 'set' . ucfirst($key));
+                $subscription->{$methodName}($value);
+            }
+        }
+    }
 }

@@ -18,6 +18,11 @@ addSubscriptions:
     methods: POST
     controller: App\Controller\SubscriptionsController::add
 
+updateSubscription:
+    path: /subscription/{id}
+    methods: PUT
+    controller: App\Controller\SubscriptionsController::update
+
 
 
 listPaymentTypes:
@@ -36,7 +41,7 @@ readPaymentType:
     controller: App\Controller\PaymentTypeController::read
 
 updatePaymentType:
-    path: /paymentType
+    path: /paymentType/{id}
     methods: PUT
     controller: App\Controller\PaymentTypeController::update
 
