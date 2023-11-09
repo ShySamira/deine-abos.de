@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\PaymentType;
 use App\Entity\Subscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +57,7 @@ class SubscriptionsController extends AbstractController
         $em->persist($subscription);
         $em->flush();
 
-        return $this->json(['success' => true, 'subscriptions' => $subscription], 201);
+        return $this->json(['success' => true, 'data' => $subscription], 201);
     }
 
     public function update(int $id, Request $request, ValidatorInterface $validator) : Response 
@@ -67,6 +68,21 @@ class SubscriptionsController extends AbstractController
             return $this->json([], 400);
         }
 
+        //Lade (Temporär) PaymentType
+        $paymentTypeId = (int)$request->request->get('paymentType');
+
+        if($paymentTypeId)
+        {
+            $paymentType = $this->doctrine->getRepository(PaymentType::class)->find($paymentTypeId);
+
+            if($paymentType)
+            {
+                $request->request->set('paymentType', $paymentType);
+            }else
+            {
+                $request->request->remove('paymentType');
+            }
+        }
         $requestData = $request->request->all();
 
         $this->setDataToPaymentType($requestData, $subscription);
@@ -86,7 +102,7 @@ class SubscriptionsController extends AbstractController
         $em = $this->doctrine->getManager();
         $em->flush();
 
-        return $this->json(['success' => true, 'paymentType' => $subscription], 201);
+        return $this->json(['success' => true, 'data' => $subscription], 201);
     }
 
     protected function setDataToPaymentType(array $requestData, object $subscription){

@@ -27,13 +27,19 @@ class Subscription implements JsonSerializable
     protected \DateTimeImmutable $startDate;
 
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
-    private ?paymentType $paymentType = null;
+    private ?PaymentType $paymentType = null;
+
+
 
     public function jsonSerialize(): mixed
     {
         return [
-            'name' => $this->name,
-            'startDate' => $this->startDate,
+            'type' => 'subscription',
+            'id' => $this->getId(),     //alternative call
+            'attributes' => [
+                'name' => $this->name,
+                'startDate' => $this->startDate,
+            ]
         ];
     }
 
@@ -62,16 +68,17 @@ class Subscription implements JsonSerializable
         return $this;
     }
 
-    public function getPaymentType(): ?paymentType
+    public function getPaymentType(): ?PaymentType
     {
         return $this->paymentType;
     }
 
-    public function setPaymentType(?paymentType $paymentType): static
+    public function setPaymentType(?PaymentType $paymentType): static
     {
         $this->paymentType = $paymentType;
 
         return $this;
     }
+
 
 }

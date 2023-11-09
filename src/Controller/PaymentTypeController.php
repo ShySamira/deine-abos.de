@@ -29,7 +29,7 @@ class PaymentTypeController extends AbstractController
     {
         $paymentType = new PaymentType();
         $this->setDataToPaymentType($request->request->all(),$paymentType);
-        
+
         $error = $validator->validate($paymentType);
 
         if(0 !== count($error)){
@@ -46,7 +46,7 @@ class PaymentTypeController extends AbstractController
         $em->persist($paymentType);
         $em->flush();
 
-        return $this->json(['success' => true, 'paymentType' => $paymentType], 201);
+        return $this->json(['success' => true, 'data' => $paymentType], 201);
     }
 
     public function read() : Response 
@@ -82,7 +82,7 @@ class PaymentTypeController extends AbstractController
         $em = $this->doctrine->getManager();
         $em->flush();
 
-        return $this->json(['success' => true, 'paymentType' => $paymentType], 201);
+        return $this->json(['success' => true, 'data' => $paymentType], 201);
     }
 
     public function delete() : Response 
