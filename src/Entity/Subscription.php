@@ -40,20 +40,23 @@ class Subscription implements JsonSerializable
 
     public function jsonSerialize(): mixed
     {
-        return [
+        $returnValue = [
             'type' => 'subscription',
             'id' => $this->getId(),     //alternative call
             'attributes' => [
                 'name' => $this->name,
                 'startDate' => $this->startDate,
             ],
-            // 'links' => [
-            //     'self' => $this->router->generate('', ['id' => $this->id]),
-            // ],
             'links' => [
                 'self' => '/subscriptions/' . $this->id, 
-            ]
+            ],
         ];
+
+        if($this->getPaymentType()){
+            $this->addPaymentTypeRelation($returnValue);
+        }
+
+        return $returnValue;
     }
 
     public function getId(): int{
@@ -93,5 +96,15 @@ class Subscription implements JsonSerializable
         return $this;
     }
 
-
+    protected function addPaymentTypeRelation(array &$returnValue)
+    {
+        $returnValue['relationships'] = [
+                        'paymentType' => [
+                            'links' => [
+                                'related' => '/paymentType/' . $this->getPaymentType()->getId(),
+                            ]
+                        ]
+                    ];   
+                    
+    }
 }
