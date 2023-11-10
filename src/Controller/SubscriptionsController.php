@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SubscriptionsController extends AbstractController
@@ -20,7 +21,7 @@ class SubscriptionsController extends AbstractController
 
     }
 
-    public function list():Response
+    public function list(RouterInterface $router):Response
     {
 
         $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
@@ -29,14 +30,14 @@ class SubscriptionsController extends AbstractController
             return $this->json(['success' => false], 404);
         }
         $dataArray = [
-            'success' => true,
-            'subscriptions' => $subscriptions,
+            'data' => $subscriptions,
+            'link' => $router->generate('listSubscriptions'),
         ];
 
         return $this->json($dataArray);
     }
 
-    public function add(Request $request, ValidatorInterface $validator):Response
+    public function create(Request $request, ValidatorInterface $validator):Response
     {
         $subscriptionName = $request->request->get('name');
 
@@ -58,6 +59,17 @@ class SubscriptionsController extends AbstractController
         $em->flush();
 
         return $this->json(['success' => true, 'data' => $subscription], 201);
+    }
+
+    public function read(int $id): Response
+    {
+        $subscription = $this->doctrine->getRepository(Subscription::class)->find($id);
+
+        if(!$subscription){
+            return $this->json([], 400);
+        }
+
+        return $this->json(['data' => $subscription]);
     }
 
     public function update(int $id, Request $request, ValidatorInterface $validator) : Response 

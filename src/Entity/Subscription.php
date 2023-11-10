@@ -8,11 +8,18 @@ use JsonSerializable;
 use App\Repository\SubscriptionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 class Subscription implements JsonSerializable
 {
+
+    // protected RouterInterface $router;
+
+    // public function __construct(RouterInterface $router){
+    //     $this->router = $router;
+    // }
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -39,6 +46,12 @@ class Subscription implements JsonSerializable
             'attributes' => [
                 'name' => $this->name,
                 'startDate' => $this->startDate,
+            ],
+            // 'links' => [
+            //     'self' => $this->router->generate('', ['id' => $this->id]),
+            // ],
+            'links' => [
+                'self' => '/subscriptions/' . $this->id, 
             ]
         ];
     }
