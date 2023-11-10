@@ -63,28 +63,34 @@ class SubscriptionsController extends AbstractController
     public function update(int $id, Request $request, ValidatorInterface $validator) : Response 
     {
         $subscription = $this->doctrine->getRepository(Subscription::class)->find($id);
+        $paymentTypeId = (int)$request->request->get('paymentType');
+        //$request->request->set('paymentType', );
+        $request->request->remove('paymentType');
+        $paymentType = $this->doctrine->getRepository(PaymentType::class)->find($paymentTypeId);
 
         if(!$subscription){
             return $this->json([], 400);
         }
 
-        //Lade (Temporär) PaymentType
-        $paymentTypeId = (int)$request->request->get('paymentType');
 
-        if($paymentTypeId)
-        {
-            $paymentType = $this->doctrine->getRepository(PaymentType::class)->find($paymentTypeId);
+        // //Lade (Temporär) PaymentType
+        // $paymentTypeId = (int)$request->request->get('paymentType');
 
-            if($paymentType)
-            {
-                $request->request->set('paymentType', $paymentType);
-            }else
-            {
-                $request->request->remove('paymentType');
-            }
-        }
+        // if($paymentTypeId)
+        // {
+        //     $paymentType = $this->doctrine->getRepository(PaymentType::class)->find($paymentTypeId);
+
+        //     if($paymentType)
+        //     {
+        //         $request->request->set('paymentType', $paymentType->getName());
+        //     }else
+        //     {
+        //         $request->request->remove('paymentType');
+        //     }
+        // }
+
         $requestData = $request->request->all();
-
+        $requestData['PaymentType'] = $paymentType;
         $this->setDataToPaymentType($requestData, $subscription);
 
         $error = $validator->validate($subscription);
