@@ -41,7 +41,7 @@ createPaymentType:
     controller: App\Controller\PaymentTypeController::create
 
 readPaymentType:
-    path: /paymentType
+    path: /paymentType/{id}
     methods: GET
     controller: App\Controller\PaymentTypeController::read
 

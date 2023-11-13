@@ -12,15 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
-class Subscription implements JsonSerializable
+class Subscription //implements JsonSerializable
 {
-
-    // protected RouterInterface $router;
-
-    // public function __construct(RouterInterface $router){
-    //     $this->router = $router;
-    // }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
@@ -38,26 +31,26 @@ class Subscription implements JsonSerializable
 
 
 
-    public function jsonSerialize(): mixed
-    {
-        $returnValue = [
-            'type' => 'subscription',
-            'id' => $this->getId(),     //alternative call
-            'attributes' => [
-                'name' => $this->name,
-                'startDate' => $this->startDate,
-            ],
-            'links' => [
-                'self' => '/subscriptions/' . $this->id, 
-            ],
-        ];
+    // public function jsonSerialize(): mixed
+    // {
+    //     $returnValue = [
+    //         'type' => 'subscription',
+    //         'id' => $this->getId(),     //alternative call
+    //         'attributes' => [
+    //             'name' => $this->name,
+    //             'startDate' => $this->startDate,
+    //         ],
+    //         'links' => [
+    //             'self' => '/subscriptions/' . $this->id, 
+    //         ],
+    //     ];
 
-        if($this->getPaymentType()){
-            $this->addPaymentTypeRelation($returnValue);
-        }
+    //     if($this->getPaymentType()){
+    //         $this->addPaymentTypeRelation($returnValue);
+    //     }
 
-        return $returnValue;
-    }
+    //     return $returnValue;
+    // }
 
     public function getId(): int{
         return $this->id;
@@ -96,15 +89,15 @@ class Subscription implements JsonSerializable
         return $this;
     }
 
-    protected function addPaymentTypeRelation(array &$returnValue)
-    {
-        $returnValue['relationships'] = [
-                        'paymentType' => [
-                            'links' => [
-                                'related' => '/paymentType/' . $this->getPaymentType()->getId(),
-                            ]
-                        ]
-                    ];   
+    // protected function addPaymentTypeRelation(array &$returnValue)
+    // {
+    //     $returnValue['relationships'] = [
+    //                     'paymentType' => [
+    //                         'links' => [
+    //                             'related' => '/paymentType/' . $this->getPaymentType()->getId(),
+    //                         ]
+    //                     ]
+    //                 ];   
                     
-    }
+    // }
 }

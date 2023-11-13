@@ -6,31 +6,45 @@ namespace App\Controller;
 
 use App\Entity\PaymentType;
 use App\Entity\Subscription;
+use App\Serializer\SubscriptionNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SubscriptionsController extends AbstractController
 {
-    
-    public function __construct(private ManagerRegistry $doctrine)
-    {
+    protected $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
     }
 
-    public function list(RouterInterface $router):Response
+    public function list(RouterInterface $router, SubscriptionNormalizer $subscriptionNormalizer):Response
     {
+        $serializer = new Serializer([$subscriptionNormalizer], []);
 
         $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
 
         if(!$subscriptions){
             return $this->json(['success' => false], 404);
         }
+
+        dd($this->container->get('app.serializer.subscription_normalizer'));
+        foreach($subscriptions as $subscription){
+            $array = $serializer->normalize($subscription, null, ['circular_reference_handler' => function ($object){
+                return $object->getId();
+            }]);
+
+            $subscriptionsColletion[] = $array;
+        }
+
         $dataArray = [
-            'data' => $subscriptions,
+            'data' => $subscriptionsColletion,
             'link' => $router->generate('listSubscriptions'),
         ];
 
