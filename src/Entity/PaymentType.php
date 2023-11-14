@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PaymentTypeRepository::class)]
-class PaymentType implements JsonSerializable
+class PaymentType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -34,17 +34,6 @@ class PaymentType implements JsonSerializable
     {
         $this->subscriptions = new ArrayCollection();
     }
-
-    public function jsonSerialize()
-    {
-        return[
-            'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description ?? '',
-        ];
-    }
-
-
 
     public function getId() : int
     {

@@ -6,13 +6,14 @@ namespace App\Controller;
 
 use App\Entity\PaymentType;
 use App\Entity\Subscription;
+use App\Form\SubscriptionType;
 use App\Serializer\SubscriptionNormalizer;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SubscriptionsController extends AbstractController
@@ -26,64 +27,53 @@ class SubscriptionsController extends AbstractController
 
     public function list(RouterInterface $router, SubscriptionNormalizer $subscriptionNormalizer):Response
     {
-        $serializer = new Serializer([$subscriptionNormalizer], []);
-
         $subscriptions = $this->doctrine->getRepository(Subscription::class)->findAll();
 
-        if(!$subscriptions){
-            return $this->json(['success' => false], 404);
-        }
-
-        dd($this->container->get('app.serializer.subscription_normalizer'));
-        foreach($subscriptions as $subscription){
-            $array = $serializer->normalize($subscription, null, ['circular_reference_handler' => function ($object){
-                return $object->getId();
-            }]);
-
-            $subscriptionsColletion[] = $array;
-        }
-
-        $dataArray = [
-            'data' => $subscriptionsColletion,
-            'link' => $router->generate('listSubscriptions'),
-        ];
-
-        return $this->json($dataArray);
+        return $this->render('subscription/list.html.twig',[
+            'subscriptions' => $subscriptions
+        ]);
     }
 
-    public function create(Request $request, ValidatorInterface $validator):Response
+    public function new(Request $request):Response
     {
-        $subscriptionName = $request->request->get('name');
+        $subscription = new Subscription();
+        $subscription->setStartDate(new DateTimeImmutable());
 
-        $subscription = (new Subscription())->setName($subscriptionName)->setStartDate(new \DateTimeImmutable());
-        $error = $validator->validate($subscription);
+        $form = $this->createForm(SubscriptionType::class, $subscription);
 
-        if(0 !== count($error)){
-            $errorMessages = [];
+        $form->handleRequest($request);
 
-            foreach($error as $violation){
-                $errorMessages[] = $violation->getPropertyPath() . ": " . $violation->getMessage();
-            }
-
-            return $this->json(['success' => false, 'errors' => $errorMessages], 400);
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $em = $this->doctrine->getManager();
+            $em->persist($subscription);
+            $em->flush();
+            return $this->redirectToRoute('listSubscriptions');
         }
 
-        $em = $this->doctrine->getManager();
-        $em->persist($subscription);
-        $em->flush();
-
-        return $this->json(['success' => true, 'data' => $subscription], 201);
+        return $this->render('subscription/new.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 
-    public function read(int $id): Response
+    public function detail(int $id, Request $request): Response
     {
         $subscription = $this->doctrine->getRepository(Subscription::class)->find($id);
 
-        if(!$subscription){
-            return $this->json([], 400);
+        $form = $this->createForm(SubscriptionType::class, $subscription);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $em = $this->doctrine->getManager();
+            $em->flush();
         }
 
-        return $this->json(['data' => $subscription]);
+        return $this->render('subscription/detail.html.twig', [
+            'subscription' => $subscription,
+            'form' => $form->createView()
+        ]);
     }
 
     public function update(int $id, Request $request, ValidatorInterface $validator) : Response 

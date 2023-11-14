@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>subscriptions<h2>
+    <div class="container-fluid">
+    {% for subscription in subscriptions %}
+        {% include 'subscription/includes/subscription_detail.html.twig' %}
+    {% endfor %}
+    </div>
+{% endblock %}

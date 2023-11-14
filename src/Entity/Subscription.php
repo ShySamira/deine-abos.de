@@ -29,28 +29,14 @@ class Subscription //implements JsonSerializable
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
     private ?PaymentType $paymentType = null;
 
+    #[ORM\Column(nullable: true)]
+    protected ?float $costs = null;
 
+    #[ORM\Column(nullable: true)]
+    protected ?int $period = null;
 
-    // public function jsonSerialize(): mixed
-    // {
-    //     $returnValue = [
-    //         'type' => 'subscription',
-    //         'id' => $this->getId(),     //alternative call
-    //         'attributes' => [
-    //             'name' => $this->name,
-    //             'startDate' => $this->startDate,
-    //         ],
-    //         'links' => [
-    //             'self' => '/subscriptions/' . $this->id, 
-    //         ],
-    //     ];
-
-    //     if($this->getPaymentType()){
-    //         $this->addPaymentTypeRelation($returnValue);
-    //     }
-
-    //     return $returnValue;
-    // }
+    #[ORM\ManyToOne]
+    private ?Category $category = null;
 
     public function getId(): int{
         return $this->id;
@@ -89,15 +75,39 @@ class Subscription //implements JsonSerializable
         return $this;
     }
 
-    // protected function addPaymentTypeRelation(array &$returnValue)
-    // {
-    //     $returnValue['relationships'] = [
-    //                     'paymentType' => [
-    //                         'links' => [
-    //                             'related' => '/paymentType/' . $this->getPaymentType()->getId(),
-    //                         ]
-    //                     ]
-    //                 ];   
-                    
-    // }
+    public function getCosts(): ?float
+    {
+        return $this->costs;
+    }
+
+    public function setCosts(?float $costs): static
+    {
+        $this->costs = $costs;
+
+        return $this;
+    }
+
+    public function getPeriod(): ?int
+    {
+        return $this->period;
+    }
+
+    public function setPeriod(?int $period): static
+    {
+        $this->period = $period;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
 }

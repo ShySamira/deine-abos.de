@@ -13,20 +13,25 @@ listSubscriptions:
     methods: GET
     controller: App\Controller\SubscriptionsController::list
 
-createSubscription:
-    path: /subscription
-    methods: POST
-    controller: App\Controller\SubscriptionsController::create
+newSubscription:
+    path: /subscription/new
+    methods: GET
+    controller: App\Controller\SubscriptionsController::new
 
-readSubscription:
+saveNewSubscription:
+    path: /subscription/new
+    methods: POST
+    controller: App\Controller\SubscriptionsController::new
+
+detailSubscription:
     path: /subscription/{id}
     methods: GET
-    controller: App\Controller\SubscriptionsController::read
+    controller: App\Controller\SubscriptionsController::detail
 
 updateSubscription:
     path: /subscription/{id}
-    methods: PUT
-    controller: App\Controller\SubscriptionsController::update
+    methods: POST
+    controller: App\Controller\SubscriptionsController::detail
 
 
 

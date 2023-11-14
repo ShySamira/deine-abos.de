@@ -30,7 +30,7 @@ class SubscriptionNormalizer implements NormalizerInterface
             'startDate' => $object->getStartDate(),
             ];
         $returnData['links'] = [
-            'self' => $this->router->generate('readSubscription', ['id' => $object->getId()])
+            //'self' => $this->router->generate('readSubscription', ['id' => $object->getId()])
         ];
 
         $this->createRelationLinks($object, $returnData);
@@ -50,7 +50,7 @@ class SubscriptionNormalizer implements NormalizerInterface
             $returnData['relationships'] = [
                 'paymentType' => [
                     'links' => [
-                        'related' => $this->router->generate('readPaymentType', ['id' => $subscription->getPaymentType()->getId()]),
+                        //'related' => $this->router->generate('readPaymentType', ['id' => $subscription->getPaymentType()->getId()]),
                     ]
                 ]
             ];

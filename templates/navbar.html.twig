@@ -1,0 +1,16 @@
+<nav id='menu'>
+    <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label></label>
+    <ul>
+        <div style="float: left;">
+            <a class="navbar-brand" href="#">
+              <img src="/images/logo.jpg" alt="Logo" width="40" height="40" class="d-inline-block align-text-top">
+              Deine-Abos.de
+            </a>
+          </div>         
+      <li><a href='{{ path('index') }}'>Home</a></li>
+      <li><a class='dropdown-arrow' href=''>Subscriptions</a>
+        <ul class='sub-menus'>
+          <li><a href='{{ path('listSubscriptions') }}'>List</a></li>
+          <li><a href='{{ path('newSubscription') }}'>New</a></li>   
+    </ul>
+  </nav>
